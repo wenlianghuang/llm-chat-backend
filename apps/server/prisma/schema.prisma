@@ -1,0 +1,45 @@
+// Prisma schema for multi-session chat backend
+// Database: PostgreSQL (local via Docker Compose)
+
+generator client {
+  provider      = "prisma-client-js"
+  // native = local macOS/dev; debian/linux-arm64 = Docker (bookworm) on amd64/arm64
+  binaryTargets = ["native", "debian-openssl-3.0.x", "linux-arm64-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// A conversation session that groups related messages.
+model Session {
+  id        String    @id @default(cuid())
+  /// Optional display title (e.g. derived from the first user message later).
+  title     String?
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  messages  Message[]
+
+  @@map("sessions")
+}
+
+/// A single chat message belonging to a session.
+model Message {
+  id        String      @id @default(cuid())
+  sessionId String      @map("session_id")
+  session   Session     @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  role      MessageRole
+  content   String
+  createdAt DateTime    @default(now()) @map("created_at")
+
+  /// Speeds up "list messages for a session in chronological order".
+  @@index([sessionId, createdAt])
+  @@map("messages")
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}

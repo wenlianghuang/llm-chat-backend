@@ -1,0 +1,14 @@
+node_modules
+**/node_modules
+**/dist
+.git
+.turbo
+.cursor
+**/.env
+**/.env.*
+!**/.env.example
+*.log
+.DS_Store
+agent-transcripts
+personal_docs
+record.txt
