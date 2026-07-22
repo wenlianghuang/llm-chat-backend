@@ -114,3 +114,7 @@ envs/
 
 # personal devs stuff
 personal_docs/
+
+note*
+
+.gitignore
